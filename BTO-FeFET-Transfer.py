@@ -13,14 +13,14 @@ from itertools import cycle
 
 
 """Plot Fonts and Text size"""
-plt.rcParams['font.size'] = 12
+plt.rcParams['font.size'] = 16
 plt.rcParams['font.serif'] = "Times New Roman"
 
 """Polarization lists"""
-bto_0min = [7.71639011874591 * math.pow(10, -6), -18.4175208452096 * math.pow(10, -6)]   # Polarization for +10V and -20V in C/cm^2
-bto_30min = [5.51971896665065 * math.pow(10, -6), -12.8903907077738 * math.pow(10, -6)]   # Polarization for +10V and -20V in C/cm^2
-bto_60min = [3.96521592786389 * math.pow(10, -6), -7.00656333401504 * math.pow(10, -6)]   # Polarization for +10V and -20V in C/cm^2
-bto_120min = [5.66603116356575 * math.pow(10, -6), -1.92776351357426 * math.pow(10, -6)]   # Polarization for +10V and -20V in C/cm^2
+bto_0min = [26.6032443438545 * math.pow(10, -6), -18.4175208452096 * math.pow(10, -6)]   # Polarization for +20V and -20V in C/cm^2
+bto_30min = [16.80874827319 * math.pow(10, -6), -12.8903907077738 * math.pow(10, -6)]   # Polarization for +20V and -20V in C/cm^2
+bto_60min = [7.14012215670369 * math.pow(10, -6), -7.00656333401504 * math.pow(10, -6)]   # Polarization for +20V and -20V in C/cm^2
+bto_120min = [10.8047044250526 * math.pow(10, -6), -1.92776351357426 * math.pow(10, -6)]   # Polarization for +20V and -20V in C/cm^2
 bto_list = [bto_0min, bto_30min, bto_60min, bto_120min]
 
 """Global material constants/parameters"""
@@ -28,8 +28,8 @@ bto_list = [bto_0min, bto_30min, bto_60min, bto_120min]
 k = 1.38 * math.pow(10, -23)  # Boltzmann constant (J/K)
 T = 300  # room temperature (K)
 q = 1.602 * math.pow(10, -19)  # Charge of electron (C) or the electron volt conversion of J to eV (J)
-na = 5.533 * math.pow(10, 19)  # p-doping concentration of the substrate, used in nmos (1/cm^3)
-nd = 1 * math.pow(10, 10)  # n-doping concentration of the substrate, used in pmos (1/cm^3)
+na = 1 * math.pow(10, 21)  # p-doping concentration of the substrate, used in nmos (1/cm^3)
+nd = 1 * math.pow(10, 18)  # n-doping concentration of the substrate, used in pmos (1/cm^3)
 ni = 1 * math.pow(10, 10)  # intrinsic carrier concentration of silicon at 300K (1/cm^3)
 chi_si = 4.05  # electron affinity of Si (eV)
 eg_si = 1.12  # band-gap of Si at 300K (eV)
@@ -37,7 +37,6 @@ phi_m = 4.32  # metal work function of electrode (eV)
 ep_naught = 8.854 * math.pow(10, -14)  # permittivity of free space (F/cm)
 mu_n = 1400  # mobility of electrons in si at 300K (cm^2/V*s)
 mu_p = 450  # mobility of holes in si at 300K (cm^2/V*s)
-gamma = 0  # variable used to control if the vt is increased or decreased based on the polarization. Positive polarization will decrease Vt in an nmos, but increase Vt in a pmos, and vice versa
 q_it = 0  # trapped charges at interface, ignoring for now
 ep_si = 11.9  # dielectric constant of silicon
 ep_ox = 2500  # dielectric constant of ferroelectric oxide
@@ -50,7 +49,7 @@ dopant = 0  # variable for dopant concentration, either na or nd (1/cm^3)
 mobility = 0  # variable for carrier mobility, either mu_n or mu_p (cm^2/V*s)
 
 """Thickness of FE material"""
-thickness_nm = 100 * math.pow(10, -9)
+thickness_nm = 105.7 * math.pow(10, -9)
 thickness_cm = thickness_nm / math.pow(10, -2)
 
 """Calculated material parameters"""
@@ -101,9 +100,6 @@ def create_range(start, end, step):
 """Function that is used to plot data and save the files to various folders"""
 def plotting(y_axis, x_axis, y_label, x_label, title, scale, legend, yaxislim, ymax, ymin):
     print("Now Plotting...")
-    x_color_plot = []
-    y_color_plot = []
-    color_legend = []
     lines = ["-", "--", "-.", ":"]
     linecycler = cycle(lines)
     colors = ["blue", "green", "red", "black", "magenta", "orange", "cyan"]
@@ -114,7 +110,8 @@ def plotting(y_axis, x_axis, y_label, x_label, title, scale, legend, yaxislim, y
         ax.plot(x_axis[k], y_axis[k], linestyle=next(linecycler), color=next(colorcycler), linewidth=1, label="{}".format(legend[k]))
 
     ax.set_xlabel(x_label)
-    ax.legend(loc='lower right')
+    ax.legend(loc='lower right', fontsize="small")
+    #ax.legend(loc='lower left', bbox_to_anchor=(0, 1.01), ncol=1, borderaxespad=10, frameon=False)
     if yaxislim:
         axes = plt.gca()
         axes.set_ylim(ymin, ymax)
@@ -165,7 +162,7 @@ def trad_Id_Vg_calc(vt, bto, vprog):
 
     idvg_meta_plot.append(idvg_plot)
     vg_meta_plot.append(vg_plot)
-    legend_idvg_plot.append("BTO: {} Vprog: {}".format(bto, vprog))
+    legend_idvg_plot.append("BTO {}, {}".format(bto, vprog))
     return
 
 
@@ -199,7 +196,7 @@ def trad_Id_Vd_calc(vt, bto, vprog):
 
     idvd_meta_plot.append(idvd_plot)
     vd_meta_plot.append(vd_plot)
-    legend_idvd_plot.append("BTO: {} Vprog: {}".format(bto, vprog))
+    legend_idvd_plot.append("BTO {}, {}".format(bto, vprog))
     return
 
 
@@ -216,7 +213,6 @@ if __name__ == '__main__':
         dopant = na
         mobility = mu_n
         v_d = 1 * drain_bias
-        gamma = 1
         v_fb = (phi_m - phi_si)  # flatband voltage
         phi_ms = v_fb  # difference in workfunctions of metal and silicon is the same as the flatband voltage
         sqrt_input = 4 * ep_si * ep_naught * q * dopant * phi_f
@@ -228,7 +224,6 @@ if __name__ == '__main__':
         dopant = nd
         mobility = mu_p
         v_d = -1 * drain_bias
-        gamma = -1
         v_fb = (phi_m - phi_si)  # flatband voltage
         phi_ms = v_fb  # difference in workfunctions of metal and silicon is the same as the flatband voltage
         sqrt_input = 4 * ep_si * ep_naught * q * dopant * abs(phi_f)
@@ -245,14 +240,14 @@ if __name__ == '__main__':
         iter = 0
         for pr in bto_iter:
             if iter % 2 == 0:
-                vprog = "+10V"
+                vprog = "$V_{T,Min}$"
             else:
-                vprog = "-20V"
-            vt = vt_naught - (gamma * pr / c_ox_p)
+                vprog = "$V_{T,Max}$"
+            vt = vt_naught - (pr / c_ox_p)
             #print(bto, vprog, vt)
             trad_Id_Vd_calc(vt, bto, vprog)
             trad_Id_Vg_calc(vt, bto, vprog)
             iter += 1
 
-    plotting(idvd_meta_plot, vd_meta_plot, "Current Density ($A/cm^2$)", "Drain Voltage (V)", "{} Id-Vd".format(device_type), "linear", legend_idvd_plot, False, 0, 0)
-    plotting(idvg_meta_plot, vg_meta_plot, "Current Density ($A/cm^2$)", "Gate Voltage (V)", "{} Id-Vg".format(device_type), "log", legend_idvg_plot, False, 0, 0)
+    plotting(idvd_meta_plot, vd_meta_plot, "Drain Current Density ($A/cm^2$)", "Drain Voltage (V)", "{} Id-Vd".format(device_type), "linear", legend_idvd_plot, False, 0, 0)
+    plotting(idvg_meta_plot, vg_meta_plot, "Drain Current Density ($A/cm^2$)", "Gate Voltage (V)", "{} Id-Vg".format(device_type), "log", legend_idvg_plot, False, 0, 0)
