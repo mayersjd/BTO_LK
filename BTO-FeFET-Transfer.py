@@ -10,6 +10,8 @@ import math
 import os
 import matplotlib.pyplot as plt
 from itertools import cycle
+import pandas as pd
+import numpy as np
 
 
 """Plot Fonts and Text size"""
@@ -157,6 +159,7 @@ def trad_Id_Vg_calc(vt, bto, vprog):
             elif abs(v_g - vt) <= abs(v_d):  # saturation, mobility controls nmos or pmos
                 id_vg = -(w * c_ox_p * mobility / l) * (math.pow(v_g - vt, 2) / 2)
             ida_vg = id_vg / area
+            ida_vg = math.fabs(ida_vg)
             vg_plot.append(v_g)
             idvg_plot.append(ida_vg)
 
@@ -168,10 +171,10 @@ def trad_Id_Vg_calc(vt, bto, vprog):
 
 def trad_Id_Vd_calc(vt, bto, vprog):
     # Section of loops and whatnot to look at traditional Id-Vd curves for nmos and pmos devices
-    v_g = 3.3
     vd_plot = []
     idvd_plot = []
     if device_type == "nmos":
+        v_g = 3.3
         for vd in create_range(0, 5, 0.1):
             if v_g < vt:
                 id_vd = 0
@@ -183,6 +186,7 @@ def trad_Id_Vd_calc(vt, bto, vprog):
             vd_plot.append(vd)
             idvd_plot.append(ida_vd)
     else:
+        v_g = -3.3
         for vd in create_range(0, -5, -0.1):
             if v_g > vt:
                 id_vd = 0
@@ -249,5 +253,24 @@ if __name__ == '__main__':
             trad_Id_Vg_calc(vt, bto, vprog)
             iter += 1
 
-    plotting(idvd_meta_plot, vd_meta_plot, "Drain Current Density ($A/cm^2$)", "Drain Voltage (V)", "{} Id-Vd".format(device_type), "linear", legend_idvd_plot, False, 0, 0)
-    plotting(idvg_meta_plot, vg_meta_plot, "Drain Current Density ($A/cm^2$)", "Gate Voltage (V)", "{} Id-Vg".format(device_type), "log", legend_idvg_plot, False, 0, 0)
+    plotting(idvd_meta_plot, vd_meta_plot, "$J_D$ ($A/cm^2$)", "$V_D$ (V)", "{} Id-Vd".format(device_type), "linear", legend_idvd_plot, False, 0, 0)
+    #plotting(idvg_meta_plot, vg_meta_plot, "Abs $J_D$ ($|A/cm^2|$)", "$V_G$ (V)", "{} Id-Vg".format(device_type), "log", legend_idvg_plot, False, 0, 0)
+    plotting(idvg_meta_plot, vg_meta_plot, "$J_D$ ($A/cm^2$)", "$V_G$ (V)", "{} Id-Vg".format(device_type), "log",legend_idvg_plot, False, 0, 0)
+
+    """Saving simulated data to a csv file"""
+    #vd_csv = np.array(vd_meta_plot).T.tolist()
+    idvd_meta_plot.append(vd_meta_plot[0])
+    idvd_csv = np.array(idvd_meta_plot).T.tolist()
+    legend_idvd_plot.append("V_D")
+    idvd_columns = np.array(legend_idvd_plot).T.tolist()
+
+    #vg_csv = np.array(vg_meta_plot).T.tolist()
+    idvg_meta_plot.append(vg_meta_plot[0])
+    idvg_csv = np.array(idvg_meta_plot).T.tolist()
+    legend_idvg_plot.append("V_G")
+    idvg_columns = np.array(legend_idvg_plot).T.tolist()
+
+    df_1 = pd.DataFrame(idvd_csv, columns=[idvd_columns])
+    df_1.to_csv("{} Id-Vd.csv".format(device_type), index=False)
+    df_2 = pd.DataFrame(idvg_csv, columns=[idvg_columns])
+    df_2.to_csv("{} Id-Vg.csv".format(device_type), index=False)
